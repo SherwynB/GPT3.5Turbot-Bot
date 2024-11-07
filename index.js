@@ -11,14 +11,20 @@ client.on('ready', () => {
     console.log("Bot is online");
 });
 
-const CHANNELS = [809007763182977098, 776369177329795074];
+
+const CHANNELS = ['809007763182977098', '776369177329795074']; 
 
 const openai = new OpenAI({
     apiKey: process.env.OPEN_AI_API,
 });
 
 client.on('messageCreate', async (message) => {
-    if (message.author.bot) return;
+    console.log("Message received in channel:", message.channel.id);
+
+    if (message.author.bot || !CHANNELS.includes(message.channel.id.toString())) {
+        console.log("Ignoring message: either from a bot or not in allowed channels");
+        return;
+    }
 
     await message.channel.sendTyping();
 
@@ -87,12 +93,10 @@ client.on('messageCreate', async (message) => {
     for (let i = 0; i < responseMessage.length; i += chunkSizeLimit) {
         const chunk = responseMessage.substring(i, i + chunkSizeLimit);
 
-        
         const embed = new EmbedBuilder()
             .setColor('#FF0000')
-            .setDescription(`${chunk} 🇺🇸`) 
+            .setDescription(`${chunk} 🇺🇸`);
 
-        
         const sentMessage = await message.reply({ embeds: [embed] });
 
         await sentMessage.react('🇺🇸');
